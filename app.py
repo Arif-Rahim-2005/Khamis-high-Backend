@@ -5,7 +5,7 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
 from flask_restful import Api
-from models import db
+from models import db, User, System, Department, Track, Subject, ClubandSociety
 
 load_dotenv()
 app = Flask(__name__)

@@ -36,20 +36,24 @@ class System(db.Model):
     __tablename__= "systems"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     departments = db.relationship('Department', backref='system', lazy=True)
+    def __repr__(self):
+        return f"<{self.__class__.__name__} {self.name}>"
 
     
 class Department(db.Model):
     __tablename__ = 'departments'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    system_id = db.Column(db.Integer, db.ForeignKey('systems.id'), nullable=False)
+
 
     subjects = db.relationship('Subject', backref='department', lazy=True)
+    def __repr__(self):
+        return f"<{self.__class__.__name__} {self.name}>"
 
 class Track(db.Model):
     __tablename__ = 'tracks'
@@ -58,6 +62,8 @@ class Track(db.Model):
     department_id = db.Column(db.Integer, db.ForeignKey('departments.id'), nullable=False)
 
     subjects = db.relationship('Subject', backref='track', lazy=True)
+    def __repr__(self):
+        return f"<{self.__class__.__name__} {self.name}>"
 
 class Subject(db.Model):
     __tablename__ = 'subjects'
@@ -65,6 +71,8 @@ class Subject(db.Model):
     name = db.Column(db.String(100), nullable=False)
     track_id = db.Column(db.Integer, db.ForeignKey('tracks.id'), nullable=True)
     department_id = db.Column(db.Integer, db.ForeignKey('departments.id'), nullable=False)
+    def __repr__(self):
+        return f"<{self.__class__.__name__} {self.name}>"
 
 
 class ClubandSociety(db.Model):
@@ -74,4 +82,6 @@ class ClubandSociety(db.Model):
     description = db.Column(db.String(255))
     
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    def __repr__(self):
+        return f"<{self.__class__.__name__} {self.name}>"
 

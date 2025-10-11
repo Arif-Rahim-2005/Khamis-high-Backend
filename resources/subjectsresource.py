@@ -1,44 +1,75 @@
-from models import db, Subject
 from flask import request
-from flask_restful import Resource, reqparse
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_restful import Resource
+from models import db, User, Subject, Department, Track, System
+
 
 class SubjectResource(Resource):
 
+    # GET all subjects or one subject by ID
     def get(self, subject_id=None):
         if subject_id:
             subject = Subject.query.get(subject_id)
-            if subject:
-                return {
-                    'name': subject.name,
-                    'code': subject.code,
-                    'description': subject.description,
-                }, 200
-            return {'message': 'Subject not found'}, 404
-        else:
-            subjects = Subject.query.all()
-            return [{
-                'name': subj.name,
-                'code': subj.code,
-                'description': subj.description
-            } for subj in subjects], 200
+            if not subject:
+                return {'message': 'Subject not found'}, 404
 
-    @jwt_required()
+            return {
+                'id': subject.id,
+                'name': subject.name,
+                'department': subject.department.name if subject.department else None,
+                'track': subject.track.name if subject.track else None,
+                'system': subject.system.name if subject.system else None
+            }, 200
+
+        subjects = Subject.query.all()
+        return [{
+            'id': s.id,
+            'name': s.name,
+            'department': s.department.name if s.department else None,
+            'track': s.track.name if s.track else None,
+            'system': s.system.name if s.system else None
+        } for s in subjects], 200
+
+    # CREATE a new subject
     def post(self):
-        user_id = get_jwt_identity()
+        data = request.get_json()
 
-        parser = reqparse.RequestParser()
-        parser.add_argument('name', required=True)
-        parser.add_argument('code', required=True)
-        args = parser.parse_args()
+        name = data.get('name')
+        system_name = data.get('system')
+        department_name = data.get('department')
+        track_name = data.get('track')
 
-        existing = Subject.query.filter_by(name=args['name']).first()
+        if not name or not department_name:
+            return {'message': 'Name and department are required'}, 400
+
+        # Check if subject already exists
+        existing = Subject.query.filter_by(name=name).first()
         if existing:
             return {'message': 'Subject already exists'}, 400
+
+        # Find related department
+        department = Department.query.filter_by(name=department_name).first()
+        if not department:
+            return {'message': f"Department '{department_name}' not found"}, 404
+
+        # Find related system
+        system = System.query.filter_by(name=system_name).first()
+        if not system:
+            return {'message': f"System '{system_name}' not found"}, 404
+
+        # Find related track (optional)
+        track = None
+        if track_name:
+            track = Track.query.filter_by(name=track_name).first()
+            if not track:
+                return {'message': f"Track '{track_name}' not found"}, 404
+
         new_subject = Subject(
-            name=args.get('name'),
-            code=args.get('code'),
+            name=name,
+            department_id=department.id,
+            system_id=system.id,
+            track_id=track.id if track else None
         )
+
         db.session.add(new_subject)
         try:
             db.session.commit()
@@ -47,33 +78,60 @@ class SubjectResource(Resource):
             db.session.rollback()
             return {'message': 'Error creating subject', 'error': str(e)}, 500
 
-    @jwt_required()
+    # UPDATE subject details
     def put(self, subject_id):
-        user_id = get_jwt_identity()
-        parser = reqparse.RequestParser()
-        parser.add_argument('name', required=True)
-        parser.add_argument('code', required=True)
-        parser.add_argument('description', required=True)
-        args = parser.parse_args()
-
+        data = request.get_json()
         subject = Subject.query.get(subject_id)
+
         if not subject:
             return {'message': 'Subject not found'}, 404
 
-        subject.name = args.get('name', subject.name)
-        subject.code = args.get('code', subject.code)
-        subject.description = args.get('description', subject.description)
-        subject.department_id = args.get('department_id', subject.department_id)
-        subject.track_id = args.get('track_id', subject.track_id)
+        new_name = data.get('name')
+        new_department_name = data.get('department')
+        new_track_name = data.get('track')
+        new_system_name = data.get('system')
+
+        if new_name:
+            existing = Subject.query.filter_by(name=new_name).first()
+            if existing and existing.id != subject.id:
+                return {'message': 'A subject with that name already exists'}, 400
+            subject.name = new_name
+
+        if new_department_name:
+            department = Department.query.filter_by(name=new_department_name).first()
+            if not department:
+                return {'message': f"Department '{new_department_name}' not found"}, 404
+            subject.department_id = department.id
+
+        if new_track_name:
+            track = Track.query.filter_by(name=new_track_name).first()
+            if not track:
+                return {'message': f"Track '{new_track_name}' not found"}, 404
+            subject.track_id = track.id
+
+        if new_system_name:
+            system = System.query.filter_by(name=new_system_name).first()
+            if not system:
+                return {'message': f"System '{new_system_name}' not found"}, 404
+            subject.system_id = system.id
 
         try:
             db.session.commit()
-            return {'message': 'Subject updated'}, 200
+            return {
+                'message': 'Subject updated successfully',
+                'subject': {
+                    'id': subject.id,
+                    'name': subject.name,
+                    'department': subject.department.name if subject.department else None,
+                    'track': subject.track.name if subject.track else None,
+                    'system': subject.system.name if subject.system else None
+                }
+            }, 200
         except Exception as e:
             db.session.rollback()
             return {'message': 'Error updating subject', 'error': str(e)}, 500
 
-    @jwt_required()
+    # DELETE a subject
     def delete(self, subject_id):
         subject = Subject.query.get(subject_id)
         if not subject:
@@ -82,7 +140,7 @@ class SubjectResource(Resource):
         db.session.delete(subject)
         try:
             db.session.commit()
-            return {'message': 'Subject deleted'}, 200
+            return {'message': 'Subject deleted successfully'}, 200
         except Exception as e:
             db.session.rollback()
             return {'message': 'Error deleting subject', 'error': str(e)}, 500

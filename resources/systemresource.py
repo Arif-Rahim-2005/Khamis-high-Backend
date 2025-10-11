@@ -1,10 +1,8 @@
 from models import System, db
 from flask import request
-from flask_restful import Resource
-from flask_jwt_extended import jwt_required
+from flask_restful import Resource, reqparse
 
 class SystemResource(Resource):
-    @jwt_required()
     def get(self, system_id=None):
         if system_id:
             system = System.query.get(system_id)
@@ -25,17 +23,18 @@ class SystemResource(Resource):
                 'created_at': sys.created_at.isoformat()
             } for sys in systems], 200
 
-    @jwt_required()
     def post(self):
-        data = request.get_json()
-        new_system = System(
-            name=data['name'],
-            description=data.get('description')
-        )
+        reparse = reqparse.RequestParser()
+        reparse.add_argument('name', required=True)
+        data = reparse.parse_args()
         existing = System.query.filter_by(name=data['name']).first()
         if existing:
             return {'message': 'System already exists'}, 400
 
+        new_system = System(
+            name=data['name'],
+        )
+       
         db.session.add(new_system)
         try:
             db.session.commit()
@@ -43,8 +42,7 @@ class SystemResource(Resource):
         except Exception as e:
             db.session.rollback()
             return {'message': 'An error occurred while creating the system', 'error': str(e)}, 500
-        
-    @jwt_required()
+
     def put(self, system_id):
         data = request.get_json()
         system = System.query.get(system_id)
@@ -60,9 +58,8 @@ class SystemResource(Resource):
             db.session.rollback()
             return {'message': 'An error occurred while updating the system', 'error': str(e)}, 500
     
-    @jwt_required()
-    def delete(self, system_name):
-        system = System.query.filter_by(name=system_name).first()
+    def delete(self, system_id):
+        system = System.query.filter_by(id=system_id).first()
         if not system:
             return{"message":"System not found"}, 404
         db.session.delete(system)

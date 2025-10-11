@@ -70,6 +70,7 @@ class Subject(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     track_id = db.Column(db.Integer, db.ForeignKey('tracks.id'), nullable=True)
+    system_id = db.Column(db.Integer, db.ForeignKey('systems.id'), nullable=True)
     department_id = db.Column(db.Integer, db.ForeignKey('departments.id'), nullable=False)
     def __repr__(self):
         return f"<{self.__class__.__name__} {self.name}>"

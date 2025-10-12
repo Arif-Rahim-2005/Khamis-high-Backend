@@ -1,6 +1,6 @@
 from flask import request
 from flask_restful import Resource
-from models import db, User, Subject, Department, Track, System
+from models import db, Subject, Department, Track, System
 
 
 class SubjectResource(Resource):

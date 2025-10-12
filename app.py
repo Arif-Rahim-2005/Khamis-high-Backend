@@ -7,6 +7,10 @@ from flask_migrate import Migrate
 from flask_restful import Api
 from models import db
 from resources.systemresource import SystemResource
+from resources.departments import DepartmentResource
+from resources.tracks import TrackResource
+from resources.users import SignUpResource, LogInResource, UserResource
+from resources.subjectsresource import SubjectResource
 
 load_dotenv()
 app = Flask(__name__)
@@ -23,8 +27,29 @@ db.init_app(app)
 def home():
     return jsonify(message="Welcome to the Khamis High Backend API")
 
-api.add_resource(SystemResource, '/systems', '/systems/<int:system_id>', '/systems/name/<string:system_name>')
+api.add_resource(SystemResource,
+    '/systems',
+    '/systems/<int:system_id>'
+)
 
+api.add_resource(DepartmentResource,
+    '/departments',
+    '/departments/<int:department_id>'
+)
+
+api.add_resource(TrackResource,
+    '/tracks',
+    '/tracks/<int:track_id>'
+)
+
+api.add_resource(SubjectResource,
+    '/subjects',
+    '/subjects/<int:subject_id>'
+)
+
+api.add_resource(SignUpResource, "/signup")
+api.add_resource(LogInResource, "/login")
+api.add_resource(UserResource, "/users", "/users/<int:user_id>")
 
 if __name__ == '__main__':
     app.run(port=5000)

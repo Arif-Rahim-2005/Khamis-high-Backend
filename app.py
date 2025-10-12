@@ -9,24 +9,37 @@ from models import db
 from resources.systemresource import SystemResource
 from resources.departments import DepartmentResource
 from resources.tracks import TrackResource
-from resources.users import SignUpResource, LogInResource, UserResource
+from resources.users import SignupResource, LogInResource, UserResource
 from resources.subjectsresource import SubjectResource
+from resources.clubs import ClubsResource
 
+# Load environment variables
 load_dotenv()
+
+# Initialize app
 app = Flask(__name__)
-CORS(app)
-api = Api(app)
+
+# --- CONFIGS ---
+app.config['UPLOAD_FOLDER'] = os.path.join('static', 'uploads')
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///school.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'your_jwt_secret_key')
+
+# --- EXTENSIONS ---
+CORS(app)
+api = Api(app)
 jwt = JWTManager(app)
 migrate = Migrate(app, db)
 db.init_app(app)
 
+# --- ROUTES ---
 @app.route('/')
 def home():
     return jsonify(message="Welcome to the Khamis High Backend API")
 
+# ✅ RESTful endpoints
 api.add_resource(SystemResource,
     '/systems',
     '/systems/<int:system_id>'
@@ -47,10 +60,13 @@ api.add_resource(SubjectResource,
     '/subjects/<int:subject_id>'
 )
 
-api.add_resource(SignUpResource, "/signup")
+api.add_resource(SignupResource, "/signup")
 api.add_resource(LogInResource, "/login")
 api.add_resource(UserResource, "/users", "/users/<int:user_id>")
 
-if __name__ == '__main__':
-    app.run(port=5000)
+# ⚠️ FIX: Add missing forward slash in routes below
+api.add_resource(ClubsResource, "/clubs", "/clubs/<int:club_id>")
 
+# --- MAIN ---
+if __name__ == '__main__':
+    app.run(port=5000, debug=True)

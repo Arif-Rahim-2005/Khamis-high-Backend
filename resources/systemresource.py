@@ -10,7 +10,6 @@ class SystemResource(Resource):
                 return {
                     'id': system.id,
                     'name': system.name,
-                    'description': system.description,
                     'created_at': system.created_at.isoformat()
                 }, 200
             return {'message': 'System not found'}, 404
@@ -19,7 +18,6 @@ class SystemResource(Resource):
             return [{
                 'id': sys.id,
                 'name': sys.name,
-                'description': sys.description,
                 'created_at': sys.created_at.isoformat()
             } for sys in systems], 200
 
@@ -38,19 +36,18 @@ class SystemResource(Resource):
         db.session.add(new_system)
         try:
             db.session.commit()
-            return {'message': 'System created', 'id': new_system.id}, 201
+            return {'message': 'System created', 'id': new_system.id, "name":new_system.name}, 201
         except Exception as e:
             db.session.rollback()
             return {'message': 'An error occurred while creating the system', 'error': str(e)}, 500
 
-    def put(self, system_id):
+    def patch(self, system_id):
         data = request.get_json()
         system = System.query.get(system_id)
         if not system:
             return {'message': 'System not found'}, 404
 
         system.name = data.get('name', system.name)
-        system.description = data.get('description', system.description)
         try:
             db.session.commit()
             return {'message': 'System updated'}, 200

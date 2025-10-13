@@ -12,16 +12,14 @@ class TrackResource(Resource):
             return{
                 'id':track.id,
                 'name':track.name,
-                'department_id':track.department_id,
-                'created_at':track.created_at.isoformat()
+                'department':track.department.name
             }, 200
         else:
             tracks= Track.query.all()
             return[{
                 'id':track.id,
                 'name':track.name,
-                'department_id':track.department_id,
-                'created_at':track.created_at.isoformat()
+                'department':track.department.name
             
                 } for track in tracks ], 200
         

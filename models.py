@@ -35,7 +35,12 @@ class System(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    departments = db.relationship('Department', backref='system', lazy=True)
+    departments = db.relationship(
+            'Department',
+            back_populates='system',
+            lazy=True,
+            cascade="all, delete"
+        )   
     def __repr__(self):
         return f"<{self.__class__.__name__} {self.name}>"
 
@@ -47,8 +52,13 @@ class Department(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     system_id = db.Column(db.Integer, db.ForeignKey('systems.id'), nullable=False)
 
+    # ✅ Correct way to reference back to System
+    system = db.relationship('System', back_populates='departments')
 
-    subjects = db.relationship('Subject', backref='department', lazy=True)
+    # ✅ Relationship to Track
+    tracks = db.relationship('Track', back_populates='department', cascade='all, delete')
+
+    subjects = db.relationship('Subject', back_populates='department', lazy=True)
     def __repr__(self):
         return f"<{self.__class__.__name__} {self.name}>"
 
@@ -58,7 +68,9 @@ class Track(db.Model):
     name = db.Column(db.String(50), nullable=False)
     department_id = db.Column(db.Integer, db.ForeignKey('departments.id'), nullable=False)
 
-    subjects = db.relationship('Subject', backref='track', lazy=True)
+    subjects = db.relationship('Subject', back_populates='track', lazy=True)
+    department = db.relationship('Department', back_populates='tracks')
+
     def __repr__(self):
         return f"<{self.__class__.__name__} {self.name}>"
 
@@ -69,6 +81,10 @@ class Subject(db.Model):
     track_id = db.Column(db.Integer, db.ForeignKey('tracks.id'), nullable=True)
     system_id = db.Column(db.Integer, db.ForeignKey('systems.id'), nullable=True)
     department_id = db.Column(db.Integer, db.ForeignKey('departments.id'), nullable=False)
+
+    track = db.relationship('Track', back_populates='subjects')
+    department = db.relationship('Department', back_populates='subjects')
+    system = db.relationship('System', lazy=True)
     def __repr__(self):
         return f"<{self.__class__.__name__} {self.name}>"
 

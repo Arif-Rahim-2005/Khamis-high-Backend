@@ -15,8 +15,14 @@ class SubjectResource(Resource):
             return {
                 'id': subject.id,
                 'name': subject.name,
-                'department': subject.department.name if subject.department else None,
-                'track': subject.track.name if subject.track else None,
+                'track': {
+                        'id': subject.track.id,
+                        'name': subject.track.name
+                    },
+                    'department': {
+                        'id': subject.department.id,
+                        'name': subject.department.name
+                    },
                 'system': subject.system.name if subject.system else None
             }, 200
 
@@ -24,8 +30,14 @@ class SubjectResource(Resource):
         return [{
             'id': s.id,
             'name': s.name,
-            'department': s.department.name if s.department else None,
-            'track': s.track.name if s.track else None,
+            'track': {
+                'id': s.track.id,
+                'name': s.track.name
+            },
+            'department': {
+                'id': s.department.id,
+                'name': s.department.name
+            },
             'system': s.system.name if s.system else None
         } for s in subjects], 200
 
@@ -73,13 +85,28 @@ class SubjectResource(Resource):
         db.session.add(new_subject)
         try:
             db.session.commit()
-            return {'message': 'Subject created', 'id': new_subject.id}, 201
+            return {'message': 'Subject created successfully',
+            'subject': {
+                'id': new_subject.id,
+                'name': new_subject.name,
+                'track': {
+                    'id': track.id,
+                    'name': track.name
+                },
+                'department': {
+                    'id': department.id,
+                    'name': department.name
+                },
+                'system': {
+                    'id': department.system.id,
+                    'name': department.system.name
+                }            }}, 201
         except Exception as e:
             db.session.rollback()
             return {'message': 'Error creating subject', 'error': str(e)}, 500
 
     # UPDATE subject details
-    def put(self, subject_id):
+    def patch(self, subject_id):
         data = request.get_json()
         subject = Subject.query.get(subject_id)
 
@@ -122,9 +149,18 @@ class SubjectResource(Resource):
                 'subject': {
                     'id': subject.id,
                     'name': subject.name,
-                    'department': subject.department.name if subject.department else None,
-                    'track': subject.track.name if subject.track else None,
-                    'system': subject.system.name if subject.system else None
+                    'track': {
+                    'id': track.id,
+                    'name': track.name
+                },
+                'department': {
+                    'id': department.id,
+                    'name': department.name
+                },
+                'system': {
+                    'id': department.system.id,
+                    'name': department.system.name
+                }     
                 }
             }, 200
         except Exception as e:

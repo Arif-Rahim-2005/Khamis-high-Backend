@@ -10,6 +10,10 @@ class SystemResource(Resource):
                 return {
                     'id': system.id,
                     'name': system.name,
+                    'departments': [
+                        {'id': dept.id, 'name': dept.name}
+                        for dept in system.departments
+                    ],
                     'created_at': system.created_at.isoformat()
                 }, 200
             return {'message': 'System not found'}, 404
@@ -18,6 +22,10 @@ class SystemResource(Resource):
             return [{
                 'id': sys.id,
                 'name': sys.name,
+                'departments': [
+                    {'id': dept.id, 'name': dept.name}
+                    for dept in sys.departments
+                ],
                 'created_at': sys.created_at.isoformat()
             } for sys in systems], 200
 

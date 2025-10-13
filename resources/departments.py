@@ -11,7 +11,14 @@ class DepartmentResource(Resource):
                     'id': department.id,
                     'name': department.name,
                     'created_at': department.created_at.isoformat(),
-                    'system_id': department.system_id
+                      'system': {
+                        'id': department.system.id,
+                        'name': department.system.name
+                    },
+                    'tracks': [
+                        {'id': track.id, 'name': track.name}
+                        for track in department.tracks
+                    ],
                 }, 200
             return {'message': 'Department not found'}, 404
         else:
@@ -20,7 +27,14 @@ class DepartmentResource(Resource):
                 'id': dept.id,
                 'name': dept.name,
                 'created_at': dept.created_at.isoformat(),
-                'system_id': dept.system_id
+                 'system': {
+                    'id': dept.system.id,
+                    'name': dept.system.name
+                },
+                'tracks': [
+                    {'id': track.id, 'name': track.name}
+                    for track in dept.tracks
+                ],
             } for dept in departments], 200
 
     def post(self):

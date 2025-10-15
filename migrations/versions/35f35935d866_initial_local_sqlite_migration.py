@@ -1,8 +1,8 @@
-"""Initial tables
+"""Initial local SQLite migration
 
-Revision ID: b160f3a25f58
+Revision ID: 35f35935d866
 Revises: 
-Create Date: 2025-10-11 10:30:02.361647
+Create Date: 2025-10-14 14:41:28.468852
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'b160f3a25f58'
+revision = '35f35935d866'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -22,6 +22,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
     sa.Column('description', sa.String(length=255), nullable=True),
+    sa.Column('image_path', sa.String(length=255), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_clubs_and_societies'))
     )
@@ -37,10 +38,9 @@ def upgrade():
     sa.Column('password_hash', sa.String(length=128), nullable=False),
     sa.Column('email', sa.String(length=120), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.Column('title', sa.String(length=50), nullable=False),
+    sa.Column('role', sa.String(length=120), nullable=False),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_users')),
-    sa.UniqueConstraint('email', name=op.f('uq_users_email')),
-    sa.UniqueConstraint('username', name=op.f('uq_users_username'))
+    sa.UniqueConstraint('email', name=op.f('uq_users_email'))
     )
     op.create_table('departments',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -61,8 +61,10 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
     sa.Column('track_id', sa.Integer(), nullable=True),
+    sa.Column('system_id', sa.Integer(), nullable=True),
     sa.Column('department_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['department_id'], ['departments.id'], name=op.f('fk_subjects_department_id_departments')),
+    sa.ForeignKeyConstraint(['system_id'], ['systems.id'], name=op.f('fk_subjects_system_id_systems')),
     sa.ForeignKeyConstraint(['track_id'], ['tracks.id'], name=op.f('fk_subjects_track_id_tracks')),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_subjects'))
     )

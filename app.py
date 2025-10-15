@@ -1,5 +1,4 @@
 import os
-from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 from flask import Flask, jsonify
 from flask_cors import CORS
@@ -10,9 +9,12 @@ from models import db
 from resources.systemresource import SystemResource
 from resources.departments import DepartmentResource
 from resources.tracks import TrackResource
-from resources.users import SignupResource, LogInResource, UserResource
+from resources.users import SignupResource, LogInResource, UserResource, AdminResource
 from resources.subjectsresource import SubjectResource
 from resources.clubs import ClubsResource
+from resources.subjectselection import SubjectSelectionResource, SubjectSelectionByIdResource
+
+
 
 # Load environment variables
 load_dotenv()
@@ -24,12 +26,12 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = os.path.join('static', 'uploads')
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///school.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'your_jwt_secret_key')
 
 # --- EXTENSIONS ---
-CORS(app)
+CORS(app,supports_credentials=True)
 api = Api(app)
 jwt = JWTManager(app)
 migrate = Migrate(app, db)
@@ -63,10 +65,14 @@ api.add_resource(SubjectResource,
 
 api.add_resource(SignupResource, "/signup")
 api.add_resource(LogInResource, "/login")
+api.add_resource(AdminResource, "/me")
 api.add_resource(UserResource, "/users", "/users/<int:user_id>")
 
 # ⚠️ FIX: Add missing forward slash in routes below
 api.add_resource(ClubsResource, "/clubs", "/clubs/<int:club_id>")
+
+api.add_resource(SubjectSelectionResource, "/subject-selections")
+api.add_resource(SubjectSelectionByIdResource, "/subject-selections/<int:selection_id>")
 
 # --- MAIN ---
 if __name__ == '__main__':

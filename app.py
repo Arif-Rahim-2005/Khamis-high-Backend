@@ -13,6 +13,11 @@ from resources.users import SignupResource, LogInResource, UserResource, AdminRe
 from resources.subjectsresource import SubjectResource
 from resources.clubs import ClubsResource
 from resources.subjectselection import SubjectSelectionResource, SubjectSelectionByIdResource
+from resources.fee import FeeStructureResource, ServeFeeStructureFile
+from resources.Aboutimages import AboutUsImages, UploadAboutImage, UpdateAboutImage, DeleteAboutImage
+
+
+
 
 
 
@@ -31,7 +36,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'your_jwt_secret_key')
 
 # --- EXTENSIONS ---
-CORS(app,supports_credentials=True)
+CORS(app)
 api = Api(app)
 jwt = JWTManager(app)
 migrate = Migrate(app, db)
@@ -73,6 +78,15 @@ api.add_resource(ClubsResource, "/clubs", "/clubs/<int:club_id>")
 
 api.add_resource(SubjectSelectionResource, "/subject-selections")
 api.add_resource(SubjectSelectionByIdResource, "/subject-selections/<int:selection_id>")
+api.add_resource(FeeStructureResource, "/fee-structure")
+api.add_resource(ServeFeeStructureFile, "/fee-structure-file/<string:filename>")
+
+
+
+api.add_resource(AboutUsImages, '/about/images')
+api.add_resource(UploadAboutImage, '/about/upload')
+api.add_resource(UpdateAboutImage, '/about/image/<int:image_id>')
+api.add_resource(DeleteAboutImage, '/about/image/<int:image_id>')
 
 # --- MAIN ---
 if __name__ == '__main__':

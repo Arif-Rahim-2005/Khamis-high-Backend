@@ -101,9 +101,28 @@ class ClubandSociety(db.Model):
 
 
 class SubjectSelection(db.Model):
+    __tablename__= 'Subject_selections'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     subjects = db.Column(db.Text, nullable=False)  # store as JSON string
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     def __repr__(self):
         return f"<{self.__class__.__name__} {self.name}>"
+
+
+
+class FeeStructure(db.Model):
+    __tablename__= 'fee_structures'
+    id = db.Column(db.Integer, primary_key=True)
+    file_path = db.Column(db.String(255), nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class AboutUsImage(db.Model):
+    __tablename__ = 'about_us_images'
+
+    id = db.Column(db.Integer, primary_key=True)
+    filename = db.Column(db.String(255), nullable=False)
+    filepath = db.Column(db.String(255), nullable=False)
+    uploaded_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

@@ -36,47 +36,6 @@ class ClubsResource(Resource):
             'created_at': c.created_at.isoformat()
         } for c in clubs], 200
 
-    # def post(self):
-    #     data = self.parser.parse_args()
-    #     image = request.files.get('image')
-
-    #     # check for existing club
-    #     existing = ClubandSociety.query.filter_by(name=data['name']).first()
-    #     if existing:
-    #         return {'message': 'Club already exists'}, 400
-
-    #     # handle image upload
-    #     image_path = None
-    #     if image:
-    #         filename = secure_filename(image.filename)
-    #         upload_folder = app.config['UPLOAD_FOLDER']
-    #         os.makedirs(upload_folder, exist_ok=True)
-    #         image_path = os.path.join(upload_folder, filename)
-    #         image.save(image_path)
-
-    #     new_club = ClubandSociety(
-    #         name=data['name'],
-    #         description=data.get('description', ''),
-    #         image_path=image_path
-    #     )
-
-    #     db.session.add(new_club)
-    #     try:
-    #         db.session.commit()
-    #         return {
-    #             'message': 'Club created successfully',
-    #             'club': {
-    #                 'id': new_club.id,
-    #                 'name': new_club.name,
-    #                 'description': new_club.description,
-    #                 'image_url': url_for('static', filename=f'uploads/{os.path.basename(new_club.image_path)}', _external=True)
-    #                 if new_club.image_path else None,
-    #                 'created_at': new_club.created_at.isoformat()
-    #             }
-    #         }, 201
-    #     except Exception as e:
-    #         db.session.rollback()
-    #         return {'message': 'Error creating club', 'error': str(e)}, 500
 
     def post(self):
         name = request.form.get('name')

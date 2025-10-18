@@ -15,6 +15,7 @@ from resources.clubs import ClubsResource
 from resources.subjectselection import SubjectSelectionResource, SubjectSelectionByIdResource
 from resources.fee import FeeStructureResource, ServeFeeStructureFile
 from resources.Aboutimages import AboutUsImages, UploadAboutImage, UpdateAboutImage, DeleteAboutImage
+from resources.Alumni import AlumniResource, register_upload_route
 
 # ---------------------------
 # Load environment variables
@@ -97,7 +98,8 @@ api.add_resource(AboutUsImages, '/about/images')
 api.add_resource(UploadAboutImage, '/about/upload')
 api.add_resource(UpdateAboutImage, '/about/image/<int:image_id>')
 api.add_resource(DeleteAboutImage, '/about/image/<int:image_id>')
-
+api.add_resource(AlumniResource, "/alumni", "/alumni/<int:id>")
+register_upload_route(app)
 # ---------------------------
 # MAIN
 # ---------------------------

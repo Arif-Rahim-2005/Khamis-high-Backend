@@ -41,6 +41,8 @@ class System(db.Model):
             lazy=True,
             cascade="all, delete"
         )   
+    subject_selections = db.relationship('SubjectSelection', back_populates='system', cascade='all, delete')
+
     def __repr__(self):
         return f"<{self.__class__.__name__} {self.name}>"
 
@@ -54,6 +56,7 @@ class Department(db.Model):
 
     # ✅ Correct way to reference back to System
     system = db.relationship('System', back_populates='departments')
+    subject_selections = db.relationship('SubjectSelection', back_populates='department', cascade='all, delete')
 
     # ✅ Relationship to Track
     tracks = db.relationship('Track', back_populates='department', cascade='all, delete')
@@ -70,6 +73,8 @@ class Track(db.Model):
 
     subjects = db.relationship('Subject', back_populates='track', lazy=True)
     department = db.relationship('Department', back_populates='tracks')
+    subject_selections = db.relationship('SubjectSelection', back_populates='track', cascade='all, delete')
+
 
     def __repr__(self):
         return f"<{self.__class__.__name__} {self.name}>"
@@ -99,15 +104,41 @@ class ClubandSociety(db.Model):
     def __repr__(self):
         return f"<{self.__class__.__name__} {self.name}>"
 
-
 class SubjectSelection(db.Model):
-    __tablename__= 'Subject_selections'
+    __tablename__ = 'subject_selections'
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    subjects = db.Column(db.Text, nullable=False)  # store as JSON string
+    subjects = db.Column(db.Text, nullable=False)  # stored as JSON string
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Foreign keys
+    system_id = db.Column(db.Integer, db.ForeignKey('systems.id'), nullable=False)
+    department_id = db.Column(db.Integer, db.ForeignKey('departments.id'), nullable=False)
+    track_id = db.Column(db.Integer, db.ForeignKey('tracks.id'), nullable=True)
+
+    # Relationships
+    system = db.relationship('System', back_populates='subject_selections')
+    department = db.relationship('Department', back_populates='subject_selections')
+    track = db.relationship('Track', back_populates='subject_selections')
+
     def __repr__(self):
         return f"<{self.__class__.__name__} {self.name}>"
+
+
+class Alumni(db.Model):
+    __tablename__ = 'alumnis'  # lowercase & plural convention
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    current_title = db.Column(db.String(200), nullable=True)
+    year_of_completion = db.Column(db.String(10), nullable=True)  # simpler as string (e.g. "2020")
+    comment = db.Column(db.String(500), nullable=False)
+    image_path = db.Column(db.String(200), nullable=True)  # optional photo
+
+    def __repr__(self):
+        return f"<Alumni {self.name}>"
+
+
 
 
 

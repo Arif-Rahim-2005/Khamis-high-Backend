@@ -1,30 +1,29 @@
-from flask_restful import Resource, reqparse
+from flask_restful import Resource, reqparse , request
 from models import SubjectSelection, db
 import json
 
 class SubjectSelectionResource(Resource):
     # CREATE
     def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument("name", type=str, required=True, help="Name is required")
-        parser.add_argument("subjects", type=list, location="json", required=True, help="Subjects are required")
-        parser.add_argument("system_id", type=int, required=True, help="System ID is required")
-        parser.add_argument("department_id", type=int, required=True, help="Department ID is required")
-        parser.add_argument("track_id", type=int, required=False)
-
-        data = parser.parse_args()
-
-        new_selection = SubjectSelection(
-            name=data["name"],
-            subjects=json.dumps(data["subjects"]),
-            system_id=data["system_id"],
-            department_id=data["department_id"],
-            track_id=data.get("track_id")
-        )
-
-        db.session.add(new_selection)
         try:
+            data = request.get_json()  # <-- directly get the JSON payload
+            # Validate required fields
+            required_fields = ["name", "subjects", "system_id", "department_id"]
+            for field in required_fields:
+                if field not in data or not data[field]:
+                    return {"message": f"{field} is required"}, 400
+
+            new_selection = SubjectSelection(
+                name=data["name"],
+                subjects=json.dumps(data["subjects"]),  # store as JSON string
+                system_id=int(data["system_id"]),
+                department_id=int(data["department_id"]),
+                track_id=int(data.get("track_id")) if data.get("track_id") else None
+            )
+
+            db.session.add(new_selection)
             db.session.commit()
+
             return {
                 "message": "Selection added successfully",
                 "selection": {
@@ -39,20 +38,28 @@ class SubjectSelectionResource(Resource):
         except Exception as e:
             db.session.rollback()
             return {"message": "Error creating subject selection", "error": str(e)}, 500
-
     # READ ALL
     def get(self):
         selections = SubjectSelection.query.all()
         result = [
-            {
-                "id": s.id,
-                "name": s.name,
-                "subjects": json.loads(s.subjects),
-                "system_id": s.system_id,
-                "department_id": s.department_id,
-                "track_id": s.track_id
-            } for s in selections
-        ]
+                {
+                    "id": s.id,
+                    "name": s.name,
+                    "subjects": json.loads(s.subjects),
+                    "system": {
+                        "id": s.system.id if s.system else None,
+                        "name": s.system.name if s.system else None
+                    },
+                    "department": {
+                        "id": s.department.id if s.department else None,
+                        "name": s.department.name if s.department else None
+                    },
+                    "track": {
+                        "id": s.track.id if s.track else None,
+                        "name": s.track.name if s.track else None
+                    }
+                } for s in selections
+            ]
         return result, 200
 
 

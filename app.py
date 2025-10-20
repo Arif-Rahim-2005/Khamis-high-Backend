@@ -28,11 +28,11 @@ app = Flask(__name__)
 # ---------------------------
 # CONFIGS
 # ---------------------------
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+# BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+# UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
+# os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+# app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///school.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'your_jwt_secret_key')
@@ -74,11 +74,11 @@ db.init_app(app)
 def home():
     return jsonify(message="Welcome to the Khamis High Backend API")
 
-# ✅ Serve uploaded files
-@app.route('/uploads/<path:filename>')
-def serve_uploaded_file(filename):
-    """Serve uploaded images and files safely."""
-    return send_from_directory(UPLOAD_FOLDER, filename)
+# # ✅ Serve uploaded files
+# @app.route('/uploads/<path:filename>')
+# def serve_uploaded_file(filename):
+#     """Serve uploaded images and files safely."""
+#     return send_from_directory(UPLOAD_FOLDER, filename)
 
 # ✅ RESTful endpoints
 api.add_resource(SystemResource, '/systems', '/systems/<int:system_id>')

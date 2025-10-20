@@ -4,7 +4,9 @@ from flask_restful import Resource, reqparse
 from werkzeug.utils import secure_filename
 from models import ClubandSociety, db
 
-
+# Folder where club images will be stored
+UPLOAD_FOLDER = os.path.join("uploads", "Clubs")
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 class ClubsResource(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument('name', type=str, required=True, help='Name is required')
@@ -20,8 +22,7 @@ class ClubsResource(Resource):
                 'id': club.id,
                 'name': club.name,
                 'description': club.description,
-                'image_url': url_for('static', filename=f'uploads/{os.path.basename(club.image_path)}', _external=True)
-                if club.image_path else None,
+                'image_path': f"/uploads/Clubs/{club.image_path}" if club.image_path else None,
                 'created_at': club.created_at.isoformat()
             }, 200
 
@@ -31,8 +32,7 @@ class ClubsResource(Resource):
             'id': c.id,
             'name': c.name,
             'description': c.description,
-            'image_url': url_for('static', filename=f'uploads/{os.path.basename(c.image_path)}', _external=True)
-            if c.image_path else None,
+            'image_path': f"/uploads/Clubs/{c.image_path}" if c.image_path else None,
             'created_at': c.created_at.isoformat()
         } for c in clubs], 200
 
@@ -48,18 +48,16 @@ class ClubsResource(Resource):
             return {'message': 'Club already exists'}, 400
 
         # handle image upload
-        image_path = None
+        image_filename = None
         if image:
             filename = secure_filename(image.filename)
-            upload_folder = app.config['UPLOAD_FOLDER']
-            os.makedirs(upload_folder, exist_ok=True)
-            image_path = os.path.join(upload_folder, filename)
-            image.save(image_path)
+            image.save(os.path.join(UPLOAD_FOLDER, filename))
+            image_filename = filename
 
         new_club = ClubandSociety(
             name=name,
             description=description,
-            image_path=image_path
+            image_path=image_filename
         )
 
         db.session.add(new_club)
@@ -71,8 +69,7 @@ class ClubsResource(Resource):
                     'id': new_club.id,
                     'name': new_club.name,
                     'description': new_club.description,
-                    'image_url': url_for('static', filename=f'uploads/{os.path.basename(new_club.image_path)}', _external=True)
-                    if new_club.image_path else None,
+                    'image_path':f"/uploads/Clubs/{new_club.image_path}" if new_club.image_path else None,
                     'created_at': new_club.created_at.isoformat()
                 }
             }, 201
@@ -95,11 +92,8 @@ class ClubsResource(Resource):
         # handle image update
         if image:
             filename = secure_filename(image.filename)
-            upload_folder = app.config['UPLOAD_FOLDER']
-            os.makedirs(upload_folder, exist_ok=True)
-            image_path = os.path.join(upload_folder, filename)
-            image.save(image_path)
-            club.image_path = image_path
+            image.save(os.path.join(UPLOAD_FOLDER, filename))
+            club.image_path = filename
 
         try:
             db.session.commit()
@@ -109,8 +103,7 @@ class ClubsResource(Resource):
                     'id': club.id,
                     'name': club.name,
                     'description': club.description,
-                    'image_url': url_for('static', filename=f'uploads/{os.path.basename(club.image_path)}', _external=True)
-                    if club.image_path else None,
+                    'image_path': f"/uploads/Clubs/{club.image_path}" if club.image_path else None,
                     'created_at': club.created_at.isoformat()
                 }
             }, 200
@@ -122,6 +115,12 @@ class ClubsResource(Resource):
         club = ClubandSociety.query.get(club_id)
         if not club:
             return {'message': 'Club not found'}, 404
+        if club.image_path:
+            try:
+                os.remove(os.path.join(UPLOAD_FOLDER, club.image_path))
+            except FileNotFoundError:
+                pass
+
 
         db.session.delete(club)
         try:

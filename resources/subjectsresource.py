@@ -62,9 +62,13 @@ class SubjectResource(Resource):
         if not name or not department_id:
             return {'message': 'Name and department_id are required'}, 400
 
-        existing = Subject.query.filter_by(name=name).first()
+        # existing = Subject.query.filter_by(name=name).first()
+        # if existing:
+        #     return {'message': 'Subject already exists'}, 400
+        existing = Subject.query.filter_by(name=name, system_id=system_id).first()
         if existing:
-            return {'message': 'Subject already exists'}, 400
+            return {'message': f"Subject '{name}' already exists in this system"}, 400
+
 
         department = Department.query.get(department_id)
         if not department:

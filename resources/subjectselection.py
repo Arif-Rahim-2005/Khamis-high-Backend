@@ -1,4 +1,4 @@
-from flask_restful import Resource, reqparse , request
+from flask_restful import Resource, request
 from models import SubjectSelection, db
 import json
 

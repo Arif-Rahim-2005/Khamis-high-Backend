@@ -85,24 +85,19 @@ class SubjectSelectionByIdResource(Resource):
         if not selection:
             return {"message": "Selection not found"}, 404
 
-        parser = reqparse.RequestParser()
-        parser.add_argument("name", type=str)
-        parser.add_argument("subjects", type=list, location="json")
-        parser.add_argument("system_id", type=int)
-        parser.add_argument("department_id", type=int)
-        parser.add_argument("track_id", type=int)
-        data = parser.parse_args()
+        data = request.get_json() or {}
 
-        if data["name"]:
+        if "name" in data:
             selection.name = data["name"]
-        if data["subjects"]:
+        if "subjects" in data:
             selection.subjects = json.dumps(data["subjects"])
-        if data["system_id"]:
+        if "system_id" in data:
             selection.system_id = data["system_id"]
-        if data["department_id"]:
+        if "department_id" in data:
             selection.department_id = data["department_id"]
-        if data["track_id"] is not None:
+        if "track_id" in data and data["track_id"] is not None:
             selection.track_id = data["track_id"]
+
 
         db.session.commit()
 

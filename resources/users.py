@@ -22,7 +22,8 @@ class LogInResource(Resource):
             return {"message": "invalid email or password. If you don't have an account, please signup"}, 403
 
         # validate password
-        if check_password_hash(user.password_hash, data["password"]):
+        if check_password_hash(user.password_hash.decode('utf-8') if isinstance(user.password_hash, bytes) else user.password_hash, data["password"]):
+
             # then generate access token
             access_token = create_access_token(
                 identity=str(user.id),
@@ -60,7 +61,7 @@ class SignupResource(Resource):
             return {"message": "Email already registered"}, 400
 
         try:
-            hashed_password = generate_password_hash(password)
+            hashed_password = generate_password_hash(password).decode('utf-8')
 
             new_user = User(
                 username=username,
@@ -95,7 +96,11 @@ class SignupResource(Resource):
 
         except Exception as e:
             db.session.rollback()
-            return {"message": "Internal Server Error", "error": str(e)}, 500
+            import traceback
+            print("⚠️ ERROR IN SIGNUP ⚠️")
+            traceback.print_exc()
+            return {"message": "Error", "error": str(e)}, 500
+
 
 
 class UserResource(Resource):

@@ -1,7 +1,9 @@
 from sqlalchemy import MetaData
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-from werkzeug.security import generate_password_hash, check_password_hash
+# from werkzeug.security import generate_password_hash, check_password_hash
+from flask_bcrypt import generate_password_hash, check_password_hash
+
 
 convention = {
     "ix": 'ix_%(column_0_label)s',

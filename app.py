@@ -14,7 +14,7 @@ from resources.users import SignupResource, LogInResource, UserResource, AdminRe
 from resources.subjectsresource import SubjectResource
 from resources.clubs import ClubsResource
 from resources.subjectselection import SubjectSelectionResource, SubjectSelectionByIdResource
-from resources.fee import FeeStructureResource, ServeFeeStructureFile
+from resources.fee import FeeStructureResource
 from resources.Aboutimages import AboutUsImages, UploadAboutImage, UpdateAboutImage, DeleteAboutImage
 from resources.Alumni import AlumniResource
 import cloudinary
@@ -111,7 +111,7 @@ api.add_resource(ClubsResource, "/clubs", "/clubs/<int:club_id>")
 api.add_resource(SubjectSelectionResource, "/subject-selections")
 api.add_resource(SubjectSelectionByIdResource, "/subject-selections/<int:selection_id>")
 api.add_resource(FeeStructureResource, "/fee-structure")
-api.add_resource(ServeFeeStructureFile, "/fee-structure-file/<string:filename>")
+# api.add_resource(ServeFeeStructureFile, "/fee-structure-file/<string:filename>")
 api.add_resource(AboutUsImages, '/about/images')
 api.add_resource(UploadAboutImage, '/about/upload')
 api.add_resource(UpdateAboutImage, '/about/image/<int:image_id>')

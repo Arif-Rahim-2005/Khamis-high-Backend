@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from supabase import create_client, Client
+# from supabase import create_client, Client
 from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
@@ -19,6 +19,8 @@ from resources.Aboutimages import AboutUsImages, UploadAboutImage, UpdateAboutIm
 from resources.Alumni import AlumniResource
 import cloudinary
 import cloudinary.uploader
+load_dotenv()
+print("DATABASE_URL ->", os.getenv("DATABASE_URL"))
 
 cloudinary.config(
   cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
@@ -29,15 +31,14 @@ cloudinary.config(
 # ---------------------------
 # Load environment variables
 # ---------------------------
-load_dotenv()
 
 # Initialize app
 app = Flask(__name__)
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-SUPABASE_BUCKET = os.getenv("SUPABASE_BUCKET")
+# SUPABASE_URL = os.getenv("SUPABASE_URL")
+# SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+# SUPABASE_BUCKET = os.getenv("SUPABASE_BUCKET")
 
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+# supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # ---------------------------
 # CONFIGS
@@ -49,7 +50,10 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 UPLOAD_FOLDER = '/home/arifrahim/Projects/Khamishigh/Khamis-high-Backend/uploads'
 
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://neondb_owner:npg_KAflHrdX25ao@ep-raspy-salad-ag6zgnpz-pooler.c-2.eu-central-1.aws.neon.tech/Khamisdb?sslmode=require&channel_binding=require'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+
+# 'postgresql://neondb_owner:npg_KAflHrdX25ao@ep-raspy-salad-ag6zgnpz-pooler.c-2.eu-central-1.aws.neon.tech/Khamisdb?sslmode=require&channel_binding=require'
+# 
 # 'sqlite:///school.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'your_jwt_secret_key')

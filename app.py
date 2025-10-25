@@ -16,7 +16,15 @@ from resources.clubs import ClubsResource
 from resources.subjectselection import SubjectSelectionResource, SubjectSelectionByIdResource
 from resources.fee import FeeStructureResource, ServeFeeStructureFile
 from resources.Aboutimages import AboutUsImages, UploadAboutImage, UpdateAboutImage, DeleteAboutImage
-from resources.Alumni import AlumniResource, register_upload_route
+from resources.Alumni import AlumniResource
+import cloudinary
+import cloudinary.uploader
+
+cloudinary.config(
+  cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+  api_key=os.getenv("CLOUDINARY_API_KEY"),
+  api_secret=os.getenv("CLOUDINARY_API_SECRET")
+)
 
 # ---------------------------
 # Load environment variables
@@ -109,7 +117,7 @@ api.add_resource(UploadAboutImage, '/about/upload')
 api.add_resource(UpdateAboutImage, '/about/image/<int:image_id>')
 api.add_resource(DeleteAboutImage, '/about/image/<int:image_id>')
 api.add_resource(AlumniResource, "/alumni", "/alumni/<int:id>")
-register_upload_route(app)
+# register_upload_route(app)
 # ---------------------------
 # MAIN
 # ---------------------------

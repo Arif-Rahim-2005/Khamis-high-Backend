@@ -132,7 +132,7 @@ class Alumni(db.Model):
     __tablename__ = 'alumnis'  # lowercase & plural convention
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    current_title = db.Column(db.String(200), nullable=True)
+    current_title = db.Column(db.String(600), nullable=True)
     year_of_completion = db.Column(db.String(10), nullable=True)  # simpler as string (e.g. "2020")
     comment = db.Column(db.String(500), nullable=False)
     image_path = db.Column(db.String(200), nullable=True)  # optional photo

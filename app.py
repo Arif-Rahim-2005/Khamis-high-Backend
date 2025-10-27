@@ -52,7 +52,6 @@ UPLOAD_FOLDER = '/home/arifrahim/Projects/Khamishigh/Khamis-high-Backend/uploads
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 
-# 'postgresql://neondb_owner:npg_KAflHrdX25ao@ep-raspy-salad-ag6zgnpz-pooler.c-2.eu-central-1.aws.neon.tech/Khamisdb?sslmode=require&channel_binding=require'
 # 
 # 'sqlite:///school.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False

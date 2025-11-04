@@ -116,7 +116,9 @@ class SubjectResource(Resource):
         new_system_name = data.get('system')
 
         # Update name
-        if new_name:
+        if new_name and new_name != subject.name:
+            print("Incoming PATCH data:", data)
+            print("Current subject name:", subject.name)
             existing = Subject.query.filter_by(name=new_name).first()
             if existing and existing.id != subject.id:
                 return {'message': 'A subject with that name already exists'}, 400

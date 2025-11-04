@@ -8,7 +8,7 @@ class SubjectSelectionResource(Resource):
         try:
             data = request.get_json()  # <-- directly get the JSON payload
             # Validate required fields
-            required_fields = ["name", "subjects", "system_id", "department_id"]
+            required_fields = ["name", "subjects", "system_id"]
             for field in required_fields:
                 if field not in data or not data[field]:
                     return {"message": f"{field} is required"}, 400
@@ -17,7 +17,7 @@ class SubjectSelectionResource(Resource):
                 name=data["name"],
                 subjects=json.dumps(data["subjects"]),  # store as JSON string
                 system_id=int(data["system_id"]),
-                department_id=int(data["department_id"]),
+                department_id=int(data["department_id"]) if data.get("track_id") else None,
                 track_id=int(data.get("track_id")) if data.get("track_id") else None
             )
 
@@ -93,11 +93,20 @@ class SubjectSelectionByIdResource(Resource):
             selection.subjects = json.dumps(data["subjects"])
         if "system_id" in data:
             selection.system_id = data["system_id"]
-        if "department_id" in data:
-            selection.department_id = data["department_id"]
-        if "track_id" in data and data["track_id"] is not None:
-            selection.track_id = data["track_id"]
 
+        # Handle department_id safely
+        if "department_id" in data:
+            if data["department_id"] in [None, ""]:
+                selection.department_id = None
+            else:
+                selection.department_id = data["department_id"]
+
+        # Handle track_id safely
+        if "track_id" in data:
+            if data["track_id"] in [None, ""]:
+                selection.track_id = None
+            else:
+                selection.track_id = data["track_id"]
 
         db.session.commit()
 

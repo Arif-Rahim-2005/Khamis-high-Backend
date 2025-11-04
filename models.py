@@ -116,7 +116,7 @@ class SubjectSelection(db.Model):
 
     # Foreign keys
     system_id = db.Column(db.Integer, db.ForeignKey('systems.id'), nullable=False)
-    department_id = db.Column(db.Integer, db.ForeignKey('departments.id'), nullable=False)
+    department_id = db.Column(db.Integer, db.ForeignKey('departments.id'), nullable=True)
     track_id = db.Column(db.Integer, db.ForeignKey('tracks.id'), nullable=True)
 
     # Relationships
